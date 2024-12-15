@@ -19,6 +19,7 @@
 #include <readline/history.h>
 #include "sdb.h"
 #include <utils.h>
+#include <memory/vaddr.h>
 
 static int is_batch_mode = false;
 
@@ -89,7 +90,7 @@ static int cmd_x(char *args)
     for (int i = 0; i < num; ++i)
     {
       printf(FMT_PADDR, addr);
-      printf(":%x %x %x %x\n", addr, addr + 1, addr + 2, addr + 3);
+      printf(":%x %x %x %x\n", vaddr_read(addr, 1), vaddr_read(addr + 1, 1), vaddr_read(addr + 2, 1), vaddr_read(addr + 3, 1));
       addr += 4;
     }
   }
