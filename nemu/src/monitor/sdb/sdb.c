@@ -90,7 +90,7 @@ static int cmd_x(char *args)
     for (int i = 0; i < num; ++i)
     {
       printf(FMT_PADDR, addr);
-      printf(":%x %x %x %x\n", vaddr_read(addr, 1), vaddr_read(addr + 1, 1), vaddr_read(addr + 2, 1), vaddr_read(addr + 3, 1));
+      printf(":%02x %02x %02x %02x\n", vaddr_read(addr, 1), vaddr_read(addr + 1, 1), vaddr_read(addr + 2, 1), vaddr_read(addr + 3, 1));
       addr += 4;
     }
   }
