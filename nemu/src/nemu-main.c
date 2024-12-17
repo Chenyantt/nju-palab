@@ -43,16 +43,15 @@ void check_eval_expr()
 
 int main(int argc, char *argv[])
 {
+  /* Initialize the monitor. */
+#ifdef CONFIG_TARGET_AM
+  am_init_monitor();
+#else
+  init_monitor(argc, argv);
+#endif
   check_eval_expr();
-//   /* Initialize the monitor. */
-// #ifdef CONFIG_TARGET_AM
-//   am_init_monitor();
-// #else
-//   init_monitor(argc, argv);
-// #endif
+  /* Start engine. */
+  engine_start();
 
-//   /* Start engine. */
-//   engine_start();
-
-//   return is_exit_status_bad();
+  return is_exit_status_bad();
 }
