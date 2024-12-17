@@ -32,8 +32,9 @@ void check_eval_expr()
   while (fscanf(fp, "%u %s\n", &result, buf) != -1)
   {
     uint32_t ret = expr(buf, &success);
-    if (ret == result)
-      printf("True ");
+    if (ret == result){
+      //printf("True ");
+    }
     else{
       printf("False ");
       printf("result=%u my_result=%u expr=%s\n", result, ret, buf);
