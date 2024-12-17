@@ -78,8 +78,10 @@ static int gen_expr(){
 
 
 static void gen_rand_expr() {
-  buffer_idx=0;
-  while(gen_expr()==-1);
+  buffer_idx = 0;
+  while(gen_expr()==-1){
+    buffer_idx=0;
+  }
   buf[buffer_idx]=0;
 }
 
