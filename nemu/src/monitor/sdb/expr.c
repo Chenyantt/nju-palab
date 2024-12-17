@@ -274,7 +274,7 @@ uint32_t eval_expr(int start, int end, bool *success)
         return eval_expr(start, max_op_idx - 1, success) * eval_expr(max_op_idx + 1, end, success);
         break;
       case '/':
-        return eval_expr(start, max_op_idx - 1, success) + eval_expr(max_op_idx + 1, end, success);
+        return eval_expr(start, max_op_idx - 1, success) / eval_expr(max_op_idx + 1, end, success);
         break;
       default:
         break;
