@@ -39,7 +39,7 @@ int buffer_idx = 0;
 char op[4] = {'+','-','*','/'};
 
 int gen_rand_num(){
-  uint32_t rand_num = (uint32_t)rand();
+  uint32_t rand_num = (uint32_t)(rand()%10);
   char tmp_buf[40]={0};
   sprintf(tmp_buf,"%u",rand_num);
   if(strlen(tmp_buf) + buffer_idx >= 65535) return -1;
