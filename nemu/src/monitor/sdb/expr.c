@@ -138,11 +138,12 @@ static bool make_token(char *e)
   return true;
 }
 
-int bracket_stk_top;
 
 int check_parentheses(int start, int end)
 {
-  bracket_stk_top = -1;
+  int bracket_stk_top = -1;
+  int first = 0;
+  int bracket_l2r = -1;
   for (int i = start; i <= end; ++i)
   {
     if (tokens[i].type == '(')
@@ -151,13 +152,15 @@ int check_parentheses(int start, int end)
     {
       if (bracket_stk_top == -1)
         return 0;
-      else
+      else{
+        if(bracket_stk_top == 0 && first == 0) first=1,bracket_l2r=i;
         bracket_stk_top--;
+      }
     }
   }
   if (bracket_stk_top != -1)
     return 0;
-  if (tokens[start].type == '(' && tokens[end].type == ')')
+  if (tokens[start].type == '(' && tokens[end].type == ')' && bracket_l2r == end)
     return 1;
   else
     return 2;
