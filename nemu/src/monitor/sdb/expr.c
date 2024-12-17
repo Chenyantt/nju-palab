@@ -158,9 +158,9 @@ int check_parentheses(int start, int end)
   if (bracket_stk_top != -1)
     return 0;
   if (tokens[start].type == '(' && tokens[end].type == ')')
-    return 2;
-  else
     return 1;
+  else
+    return 2;
 }
 
 uint32_t eval_expr(int start, int end, bool *success)
