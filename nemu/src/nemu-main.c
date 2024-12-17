@@ -34,7 +34,7 @@ void check_eval_expr()
     bool success = true;
     uint32_t ret = expr(buf, &success);
     if (ret == result){
-      printf("True\n");
+      //printf("True\n");
     }
     else{
       printf("False ");
