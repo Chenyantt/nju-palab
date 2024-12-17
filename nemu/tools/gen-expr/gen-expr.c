@@ -26,7 +26,7 @@ static char code_buf[65536 + 128] = {}; // a little larger than `buf`
 static char *code_format =
 "#include <stdio.h>\n"
 "int main() { "
-"  unsigned result = 1u*(%s); "
+"  unsigned result = %s; "
 "  printf(\"%%u\", result); "
 "  return 0; "
 "}";
@@ -42,9 +42,10 @@ int gen_rand_num(){
   uint32_t rand_num = (uint32_t)(rand()%10);
   char tmp_buf[40]={0};
   sprintf(tmp_buf,"%u",rand_num);
-  if(strlen(tmp_buf) + buffer_idx >= 65535) return -1;
+  if(strlen(tmp_buf) + buffer_idx + 1 >= 65535) return -1;
   strcpy(buf+buffer_idx,tmp_buf);
   buffer_idx += strlen(tmp_buf);
+  buf[buffer_idx++]='u';
   return 0;
 }
 
@@ -82,6 +83,17 @@ static void gen_rand_expr() {
   buf[buffer_idx]=0;
 }
 
+static void remove_u(){
+  int j = 0;
+ 
+  for (int i = 0; buf[i] != '\0'; i++) {
+      if (buf[i] != 'u') {
+          buf[j++] = buf[i];
+      }
+  }
+  buf[j] = '\0';
+}
+
 int main(int argc, char *argv[]) {
   int seed = time(0);
   srand(seed);
@@ -112,8 +124,9 @@ int main(int argc, char *argv[]) {
     ret = fscanf(fp, "%d", &result);
     pclose(fp);
 
-    if(ret == -1) continue;;
+    if(ret == -1) continue;
 
+    remove_u();
     printf("%u %s\n", result, buf);
   }
   return 0;
