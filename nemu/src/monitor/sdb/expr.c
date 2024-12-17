@@ -118,7 +118,7 @@ static bool make_token(char *e)
         case TK_DEC:
           if (substr_len >= 32)
             assert(0);
-          strncpy(tokens[nr_token].str, e + position, substr_len);
+          strncpy(tokens[nr_token].str, e + position - substr_len, substr_len);
           tokens[nr_token].str[substr_len] = '\0';
         default:
           tokens[nr_token++].type = rules[i].token_type;
