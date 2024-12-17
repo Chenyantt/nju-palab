@@ -112,6 +112,8 @@ int main(int argc, char *argv[]) {
     ret = fscanf(fp, "%d", &result);
     pclose(fp);
 
+    if(ret == -1) continue;;
+
     printf("%u %s\n", result, buf);
   }
   return 0;
