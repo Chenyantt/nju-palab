@@ -40,6 +40,7 @@ void check_eval_expr()
       printf("False ");
       printf("result=%u my_result=%u expr=%s\n", result, ret, buf);
     }
+    printf("result=%u my_result=%u expr=%s\n", result, ret, buf);
     memset(buf, 0,sizeof buf);
   }
   fclose(fp);
