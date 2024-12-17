@@ -24,7 +24,7 @@ word_t expr(char *e, bool *success);
 void check_eval_expr()
 {
   char buf[65536] = {0};
-  FILE *fp = fopen("../tools/gen-expr/build/input", "r");
+  FILE *fp = fopen("../nemu/tools/gen-expr/build/input", "r");
   assert(fp != NULL);
 
   uint32_t result;
