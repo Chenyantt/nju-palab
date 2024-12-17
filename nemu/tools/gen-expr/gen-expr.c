@@ -31,8 +31,55 @@ static char *code_format =
 "  return 0; "
 "}";
 
+uint32_t choose(uint32_t n){
+  return (uint32_t)(rand()%n);
+}
+
+int buffer_idx = 0;
+char op[4] = {'+','-','*','/'};
+
+int gen_rand_num(){
+  uint32_t rand_num = (uint32_t)rand();
+  char tmp_buf[40]={0};
+  sprintf(tmp_buf,"%u",rand_num);
+  if(strlen(tmp_buf) + buffer_idx >= 65535) return -1;
+  strcpy(buf+buffer_idx,tmp_buf);
+  buffer_idx += strlen(tmp_buf);
+  return 0;
+}
+
+static int gen_expr(){
+  if(buffer_idx >= 65535) return -1;
+  switch (choose(3))
+  {
+  case 0:
+    return gen_rand_num();
+    break;
+  case 1:
+    buf[buffer_idx++] = '(';
+    if(gen_expr() == -1) return -1;
+    if(buffer_idx >= 65535) return -1;
+    buf[buffer_idx++]=')';return 0;
+    break;
+  case 2:
+    if(gen_expr() == -1) return -1;
+    if(buffer_idx>=65535) return -1;
+    buf[buffer_idx++]=op[choose(4)];
+    if(buffer_idx>=65535) return -1;
+    if(gen_expr()==-1) return -1;
+    return 0;
+    break;
+  default:
+    break;
+  }
+  return 0;
+}
+
+
 static void gen_rand_expr() {
-  buf[0] = '\0';
+  buffer_idx=0;
+  while(gen_expr()==-1);
+  buf[buffer_idx]=0;
 }
 
 int main(int argc, char *argv[]) {
@@ -45,6 +92,7 @@ int main(int argc, char *argv[]) {
   int i;
   for (i = 0; i < loop; i ++) {
     gen_rand_expr();
+    //strcpy(buf, "1/0");
 
     sprintf(code_buf, code_format, buf);
 
@@ -53,7 +101,8 @@ int main(int argc, char *argv[]) {
     fputs(code_buf, fp);
     fclose(fp);
 
-    int ret = system("gcc /tmp/.code.c -o /tmp/.expr");
+   // int ret = system("gcc /tmp/.code.c -o /tmp/.expr");
+    int ret = system("gcc -w /tmp/.code.c -o /tmp/.expr");
     if (ret != 0) continue;
 
     fp = popen("/tmp/.expr", "r");
