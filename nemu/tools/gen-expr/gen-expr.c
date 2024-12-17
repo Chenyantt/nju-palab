@@ -114,7 +114,7 @@ int main(int argc, char *argv[]) {
     fclose(fp);
 
    // int ret = system("gcc /tmp/.code.c -o /tmp/.expr");
-    int ret = system("gcc -w /tmp/.code.c -o /tmp/.expr");
+    int ret = system("gcc -Werror /tmp/.code.c -o /tmp/.expr");
     if (ret != 0) continue;
 
     fp = popen("/tmp/.expr", "r");
