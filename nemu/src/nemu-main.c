@@ -28,9 +28,10 @@ void check_eval_expr()
   assert(fp != NULL);
 
   uint32_t result;
-  bool success = true;
   while (fscanf(fp, "%u %s\n", &result, buf) != -1)
   {
+    
+    bool success = true;
     uint32_t ret = expr(buf, &success);
     if (ret == result){
       //printf("True ");
