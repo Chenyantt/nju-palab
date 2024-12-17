@@ -34,9 +34,11 @@ void check_eval_expr()
     uint32_t ret = expr(buf, &success);
     if (ret == result)
       printf("True ");
-    else
+    else{
       printf("False ");
-    printf("result=%u my_result=%u expr=%s\n", result, ret, buf);
+      printf("result=%u my_result=%u expr=%s\n", result, ret, buf);
+    }
+      
   }
   fclose(fp);
 }
