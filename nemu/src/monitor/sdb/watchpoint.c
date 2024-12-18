@@ -91,7 +91,7 @@ void free_WP(int no)
 void watch_display()
 {
   WP *wp = head;
-  puts("Num      What");
+  puts("Num    What");
   while (wp != NULL)
   {
     printf("%d      %s\n", wp->NO, wp->expr);
