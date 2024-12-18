@@ -21,12 +21,19 @@
 #include <regex.h>
 #include <string.h>
 
+word_t vaddr_read(vaddr_t addr, int len);
+
 enum
 {
   TK_NOTYPE = 256,
   TK_EQ,
 
   /* TODO: Add more token types */
+  TK_NE,
+  TK_DEREF,
+  TK_AND,
+  TK_REG,
+  TK_HEX,
   TK_DEC,
 };
 
@@ -43,11 +50,15 @@ static struct rule
     {" +", TK_NOTYPE}, // spaces
     {"\\+", '+'},      // plus
     {"==", TK_EQ},     // equal
+    {"!=", TK_NE},
     {"-", '-'},
     {"\\*", '*'},
     {"/", '/'},
     {"\\(", '('},
     {"\\)", ')'},
+    {"&&", TK_AND},
+    {"\\$\\$?[a-z0-9]+", TK_REG},
+    {"0x[0-9]+", TK_HEX},
     {"[0-9]+", TK_DEC},
 };
 
@@ -115,6 +126,8 @@ static bool make_token(char *e)
         {
         case TK_NOTYPE:
           break;
+        case TK_REG:
+        case TK_HEX:
         case TK_DEC:
           if (substr_len >= 32)
             assert(0);
@@ -138,7 +151,6 @@ static bool make_token(char *e)
   return true;
 }
 
-
 int check_parentheses(int start, int end)
 {
   int bracket_stk_top = -1;
@@ -152,8 +164,10 @@ int check_parentheses(int start, int end)
     {
       if (bracket_stk_top == -1)
         return 0;
-      else{
-        if(bracket_stk_top == 0 && first == 0) first=1,bracket_l2r=i;
+      else
+      {
+        if (bracket_stk_top == 0 && first == 0)
+          first = 1, bracket_l2r = i;
         bracket_stk_top--;
       }
     }
@@ -166,6 +180,9 @@ int check_parentheses(int start, int end)
     return 2;
 }
 
+int op_prio_tab[400] = {0};
+char op_associate_tab[400] = {0};
+
 uint32_t eval_expr(int start, int end, bool *success)
 {
   if (start > end)
@@ -175,15 +192,18 @@ uint32_t eval_expr(int start, int end, bool *success)
   }
   else if (start == end)
   {
-    if (tokens[start].type != TK_DEC)
+    if (tokens[start].type == TK_REG)
     {
-      *success = false;
-      return 0;
+      return isa_reg_str2val(tokens[start].str, success);
+    }
+    else if (tokens[start].type == TK_DEC || tokens[start].type == TK_HEX)
+    {
+      return (uint32_t)strtoul(tokens[start].str, NULL, 0);
     }
     else
     {
-      char *tmp_ptr;
-      return (uint32_t)strtoul(tokens[start].str, &tmp_ptr, 0);
+      *success = false;
+      return 0;
     }
   }
   else
@@ -200,10 +220,10 @@ uint32_t eval_expr(int start, int end, bool *success)
     }
     else
     {
-      int max_op_priority = 0;
+      int max_op_priority = 1;
       int max_op_idx = -1;
       int is_in_bracket = 0;
-      //+-:3 */:2 -:1
+      //&&:5 //== !=:4 //+-:3 */:2 *:1
       for (int i = start; i <= end; ++i)
       {
         switch (tokens[i].type)
@@ -214,49 +234,20 @@ uint32_t eval_expr(int start, int end, bool *success)
         case ')':
           --is_in_bracket;
           break;
-        case '*':
-        case '/':
-          if (is_in_bracket)
-            continue;
-          if (max_op_priority <= 2)
-          {
-            max_op_priority = 2;
-            max_op_idx = i;
-          }
-          break;
-        case '+':
-          if (is_in_bracket)
-            continue;
-          if (max_op_priority <= 3)
-          {
-            max_op_priority = 3;
-            max_op_idx = i;
-          }
-          break;
-        case '-':
-          if (is_in_bracket)
-            continue;
-          ;
-          if (i > start && (tokens[i - 1].type == ')' || tokens[i - 1].type == TK_DEC))
-          {
-            if (max_op_priority <= 3)
-            {
-              max_op_priority = 3;
-              max_op_idx = i;
-            }
-          }
-          else
-          {
-            if (max_op_priority < 1)
-            {
-              max_op_priority = 1;
-              max_op_idx = i;
-            }
-          }
-          break;
         default:
+          if (is_in_bracket)
+            continue;
+          if (op_prio_tab[tokens[i].type] > max_op_priority)
+            max_op_idx = i, max_op_priority = op_prio_tab[tokens[i].type];
+          else if (op_prio_tab[tokens[i].type] == max_op_priority && op_associate_tab[tokens[i].type] != 'r')
+            max_op_idx = i;
           break;
         }
+      }
+      if (max_op_idx == -1)
+      {
+        *success = false;
+        return 0;
       }
       switch (tokens[max_op_idx].type)
       {
@@ -264,25 +255,34 @@ uint32_t eval_expr(int start, int end, bool *success)
         return eval_expr(start, max_op_idx - 1, success) + eval_expr(max_op_idx + 1, end, success);
         break;
       case '-':
-        if (max_op_idx > start && (tokens[max_op_idx - 1].type == ')' || tokens[max_op_idx - 1].type == TK_DEC))
-        {
-          return eval_expr(start, max_op_idx - 1, success) - eval_expr(max_op_idx + 1, end, success);
-        }
-        else
-        {
-          return (uint32_t)(-eval_expr(max_op_idx + 1, end, success));
-        }
+        return eval_expr(start, max_op_idx - 1, success) - eval_expr(max_op_idx + 1, end, success);
         break;
       case '*':
         return eval_expr(start, max_op_idx - 1, success) * eval_expr(max_op_idx + 1, end, success);
         break;
       case '/':
         uint32_t div = eval_expr(max_op_idx + 1, end, success);
-        if(div == 0){
+        if (div == 0)
+        {
           *success = false;
           return 0;
-        }else
+        }
+        else
           return eval_expr(start, max_op_idx - 1, success) / div;
+        break;
+      case TK_EQ:
+        return eval_expr(start, max_op_idx - 1, success) == eval_expr(max_op_idx + 1, end, success);
+        break;
+      case TK_NE:
+        return eval_expr(start, max_op_idx - 1, success) != eval_expr(max_op_idx + 1, end, success);
+        break;
+      case TK_AND:
+        return eval_expr(start, max_op_idx - 1, success) && eval_expr(max_op_idx + 1, end, success);
+        break;
+      case TK_DEREF:
+        assert(max_op_idx == start);
+        vaddr_t addr = eval_expr(max_op_idx + 1, end, success);
+        return vaddr_read(addr, 4);
         break;
       default:
         break;
@@ -301,5 +301,24 @@ word_t expr(char *e, bool *success)
   }
 
   /* TODO: Insert codes to evaluate the expression. */
+  for (int i = 0; i < nr_token; i++)
+  {
+    if (tokens[i].type == '*')
+    {
+      if (i > 0 && (tokens[i - 1].type == ')' || tokens[i - 1].type == TK_REG || tokens[i - 1].type == TK_HEX || tokens[i - 1].type == TK_DEC))
+        continue;
+      else
+        tokens[i].type = TK_DEREF;
+    }
+  }
+
+  op_prio_tab[TK_DEREF] = 1;
+  op_prio_tab['*'] = op_prio_tab['/'] = 2;
+  op_prio_tab['+'] = op_prio_tab['-'] = 3;
+  op_prio_tab[TK_EQ] = op_prio_tab[TK_NE] = 4;
+  op_prio_tab[TK_AND] = 5;
+
+  op_associate_tab[TK_DEREF] = 'r';
+
   return eval_expr(0, nr_token - 1, success);
 }

@@ -85,7 +85,7 @@ static int cmd_x(char *args)
   if (num_str != NULL && addr_str != NULL)
   {
     int num = atoi(num_str);
-    paddr_t addr;
+    vaddr_t addr;
     sscanf(addr_str, "%x", &addr);
     for (int i = 0; i < num; ++i)
     {
@@ -94,6 +94,17 @@ static int cmd_x(char *args)
       addr += 4;
     }
   }
+  return 0;
+}
+
+static int cmd_p(char *args)
+{
+  bool success = true;
+  uint32_t val = expr(args, &success);
+  if (success == false)
+    printf("Bad Expression:%s\n", args);
+  else
+    printf("%u\n", val);
   return 0;
 }
 
@@ -111,6 +122,7 @@ static struct
     {"si", "Execute step by step ", cmd_si},
     {"info", "Print the info of pgr", cmd_info},
     {"x", "Print the value at the given memaddr", cmd_x},
+    {"p", "Evaluate the value of an expression", cmd_p},
 };
 
 #define NR_CMD ARRLEN(cmd_table)
