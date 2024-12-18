@@ -220,7 +220,7 @@ uint32_t eval_expr(int start, int end, bool *success)
     }
     else
     {
-      int max_op_priority = 1;
+      int max_op_priority = 0;
       int max_op_idx = -1;
       int is_in_bracket = 0;
       //&&:5 //== !=:4 //+-:3 */:2 *:1
