@@ -36,7 +36,7 @@ uint32_t choose(uint32_t n){
 }
 
 int buffer_idx = 0;
-char op[4] = {'+','-','*','/'};
+char* op[7] = {"+","-","*","/","&&","==","!="};
 
 int gen_rand_num(){
   uint32_t rand_num = (uint32_t)rand();
@@ -64,8 +64,10 @@ static int gen_expr(){
     break;
   case 2:
     if(gen_expr() == -1) return -1;
-    if(buffer_idx>=65535) return -1;
-    buf[buffer_idx++]=op[choose(4)];
+    if(buffer_idx+1>=65535) return -1;
+    int tmp_num = choose(7);
+    strcpy(buf+buffer_idx, op[tmp_num]);
+    buffer_idx += strlen(op[tmp_num]);
     if(buffer_idx>=65535) return -1;
     if(gen_expr()==-1) return -1;
     return 0;
