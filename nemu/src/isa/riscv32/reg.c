@@ -30,6 +30,7 @@ void isa_reg_display()
     printf(FMT_WORD, gpr(idx));
     puts("");
   }
+  printf("pc:");
   printf(FMT_WORD, cpu.pc);
   puts("");
 }
