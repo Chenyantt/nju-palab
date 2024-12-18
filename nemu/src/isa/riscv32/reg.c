@@ -30,14 +30,19 @@ void isa_reg_display()
     printf(FMT_WORD, gpr(idx));
     puts("");
   }
+  printf(FMT_WORD, cpu.pc);
+  puts("");
 }
 
 word_t isa_reg_str2val(const char *s, bool *success)
 {
-  
+  if (strcmp(s, "$pc") == 0)
+    return cpu.pc;
+
   for (int idx = 0; idx < MUXDEF(CONFIG_RVE, 16, 32); ++idx)
   {
-    if(strcmp(reg_name(idx), s) == 0){
+    if (strcmp(reg_name(idx), s) == 0)
+    {
       return gpr(idx);
     }
   }
