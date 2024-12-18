@@ -97,7 +97,7 @@ static int cmd_x(char *args)
     for (int i = 0; i < num; ++i)
     {
       printf(FMT_PADDR, addr);
-      printf(": %08x\n", vaddr_read(addr, 4));
+      printf(": 0x%08x\n", vaddr_read(addr, 4));
       addr += 4;
     }
   }
@@ -111,7 +111,7 @@ static int cmd_p(char *args)
   if (success == false)
     printf("Bad Expression: %s\n", args);
   else
-    printf("%08x\n", val);
+    printf("0x%08x\n", val);
   return 0;
 }
 
