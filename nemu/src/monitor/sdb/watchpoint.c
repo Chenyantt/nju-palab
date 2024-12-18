@@ -112,7 +112,7 @@ bool scan_watchpoints()
     assert(success == true);
     if (new_val != wp->old_val)
     {
-      Log("Watchpoint %d: %s changed\nOld value = %u\nNew value = %u\n",
+      Log("\nWatchpoint %d: %s changed\nOld value = %08x\nNew value = %08x\n",
           wp->NO, wp->expr, wp->old_val, new_val);
       wp->old_val = new_val;
       flag = true;

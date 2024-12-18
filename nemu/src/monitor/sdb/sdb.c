@@ -111,7 +111,7 @@ static int cmd_p(char *args)
   if (success == false)
     printf("Bad Expression: %s\n", args);
   else
-    printf("%u\n", val);
+    printf("%08x\n", val);
   return 0;
 }
 
