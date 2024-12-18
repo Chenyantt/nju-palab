@@ -23,7 +23,8 @@ typedef struct watchpoint
   struct watchpoint *next;
 
   /* TODO: Add more members if necessary */
-
+  char expr[32];
+  uint32_t old_val;
 } WP;
 
 static WP wp_pool[NR_WP] = {};
@@ -44,21 +45,56 @@ void init_wp_pool()
 
 /* TODO: Implement the functionality of watchpoint */
 
-WP *new_wp()
+void new_wp(char *e, uint32_t val)
 {
   if (free_ == NULL)
     assert(0);
-  WP *new_wp = free_;
+  WP *wp = free_;
   free_ = free_->next;
-  new_wp->next = head;
-  head = new_wp;
-  return new_wp;
+  strcpy(wp->expr, e);
+  wp->old_val = val;
+  wp->next = head;
+  head = wp;
+  printf("Watchpoint %d: %s\n", wp->NO, wp->expr);
 }
 
-void free_WP(WP *wp)
+void free_WP(int no)
 {
-  // assert
-  // WP* pre_wp=head;
-  // while(pre_wp!=NULL&&pre_wp->next!=wp)pre_wp=pre_wp->next;
-  // pre_wp->next=wp->next;
+  if (head != NULL && head->NO == no)
+  {
+    memset(head->expr, 0, sizeof head->expr);
+    WP *wp = head;
+    head = head->next;
+    wp->next = free_;
+    free_ = wp;
+  }
+  else
+  {
+    WP *pre_WP = head;
+    while (pre_WP != NULL && pre_WP->next != NULL)
+    {
+      if (pre_WP->next->NO != no)
+        pre_WP = pre_WP->next;
+      else
+      {
+        WP *wp = pre_WP->next;
+        memset(wp->expr, 0, sizeof wp->expr);
+        pre_WP->next = wp->next;
+        wp->next = free_;
+        free_ = wp;
+        break;
+      }
+    }
+  }
+}
+
+void watch_display()
+{
+  WP *wp = head;
+  puts("Num      What");
+  while (wp != NULL)
+  {
+    printf("%d      %s\n", wp->NO, wp->expr);
+    wp = wp->next;
+  }
 }

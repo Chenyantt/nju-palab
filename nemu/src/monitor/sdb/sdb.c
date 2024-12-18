@@ -26,6 +26,10 @@ static int is_batch_mode = false;
 void init_regex();
 void init_wp_pool();
 
+void new_wp(char *e, uint32_t val);
+void free_WP(int no);
+void watch_display();
+
 /* We use the `readline' library to provide more flexibility to read from stdin. */
 static char *rl_gets()
 {
@@ -72,9 +76,12 @@ static int cmd_si(char *args)
 
 static int cmd_info(char *args)
 {
-  if (args != NULL)
+  if (args != NULL){
     if (*args == 'r')
       isa_reg_display();
+    else if(*args == 'w')
+      watch_display();
+  }
   return 0;
 }
 
@@ -90,7 +97,7 @@ static int cmd_x(char *args)
     for (int i = 0; i < num; ++i)
     {
       printf(FMT_PADDR, addr);
-      printf(":%02x %02x %02x %02x\n", vaddr_read(addr, 1), vaddr_read(addr + 1, 1), vaddr_read(addr + 2, 1), vaddr_read(addr + 3, 1));
+      printf(": %08x\n", vaddr_read(addr, 4));
       addr += 4;
     }
   }
@@ -102,9 +109,25 @@ static int cmd_p(char *args)
   bool success = true;
   uint32_t val = expr(args, &success);
   if (success == false)
-    printf("Bad Expression:%s\n", args);
+    printf("Bad Expression: %s\n", args);
   else
     printf("%u\n", val);
+  return 0;
+}
+
+static int cmd_w(char *args)
+{
+  bool success = true;
+  uint32_t val = expr(args, &success);
+  if (success == false)
+    printf("Bad Expression: %s\n", args);
+  new_wp(args,val);
+  return 0;
+}
+
+static int cmd_d(char *args)
+{
+  free_WP(atoi(args));
   return 0;
 }
 
@@ -123,6 +146,8 @@ static struct
     {"info", "Print the info of pgr", cmd_info},
     {"x", "Print the value at the given memaddr", cmd_x},
     {"p", "Evaluate the value of an expression", cmd_p},
+    {"w", "Set a watchpoint", cmd_w},
+    {"d", "Delete a watchpoint", cmd_d},
 };
 
 #define NR_CMD ARRLEN(cmd_table)
