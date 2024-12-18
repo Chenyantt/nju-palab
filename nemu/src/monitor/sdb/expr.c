@@ -58,7 +58,7 @@ static struct rule
     {"\\)", ')'},
     {"&&", TK_AND},
     {"\\$\\$?[a-z0-9]+", TK_REG},
-    {"0x[0-9]+", TK_HEX},
+    {"0x[0-9a-f]+", TK_HEX},
     {"[0-9]+", TK_DEC},
 };
 
