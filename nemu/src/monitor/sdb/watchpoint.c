@@ -45,6 +45,8 @@ void init_wp_pool()
 
 /* TODO: Implement the functionality of watchpoint */
 
+word_t expr(char *e, bool *success);
+
 void new_wp(char *e, uint32_t val)
 {
   if (free_ == NULL)
@@ -97,4 +99,25 @@ void watch_display()
     printf("%d      %s\n", wp->NO, wp->expr);
     wp = wp->next;
   }
+}
+
+bool scan_watchpoints()
+{
+  WP *wp = head;
+  bool flag = false;
+  while (wp != NULL)
+  {
+    bool success = true;
+    uint32_t new_val = expr(wp->expr, &success);
+    assert(success == true);
+    if (new_val != wp->old_val)
+    {
+      Log("Watchpoint %d: %s changed\nOld value = %d\nNew value = %d\n",
+          wp->NO, wp->expr, wp->old_val, new_val);
+      wp->old_val = new_val;
+      flag = true;
+    }
+    wp = wp->next;
+  }
+  return flag;
 }
