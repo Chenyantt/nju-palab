@@ -1,5 +1,5 @@
-STUID = 1111111
-STUNAME = someone
+STUID = 1154270143@qq.com
+STUNAME = chenyantt
 
 # DO NOT modify the following code!!!
 
