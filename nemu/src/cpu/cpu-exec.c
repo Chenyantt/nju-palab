@@ -31,8 +31,8 @@ uint64_t g_nr_guest_inst = 0;
 static uint64_t g_timer = 0; // unit: us
 static bool g_print_step = false;
 
-IFDEF(CONFIG_IRINGBUF, char ringbuf[RINGBUF_SIZE])
-IFDEF(CONFIG_IRINGBUF, int head = 0, tail = 0)
+IFDEF(CONFIG_IRINGBUF, char ringbuf[RINGBUF_SIZE]);
+IFDEF(CONFIG_IRINGBUF, int head = 0, tail = 0);
 
 void device_update();
 bool scan_watchpoints();
