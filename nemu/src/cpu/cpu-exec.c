@@ -24,11 +24,15 @@
  * You can modify this value as you want.
  */
 #define MAX_INST_TO_PRINT 10
+#define RINGBUF_SIZE 1024
 
 CPU_state cpu = {};
 uint64_t g_nr_guest_inst = 0;
 static uint64_t g_timer = 0; // unit: us
 static bool g_print_step = false;
+
+IFDEF(CONFIG_IRINGBUF, char ringbuf[RINGBUF_SIZE])
+IFDEF(CONFIG_IRINGBUF, int head = 0, tail = 0)
 
 void device_update();
 bool scan_watchpoints();
@@ -42,6 +46,18 @@ static void trace_and_difftest(Decode *_this, vaddr_t dnpc) {
 #ifdef CONFIG_WATCHPOINT
   if(scan_watchpoints()) nemu_state.state = NEMU_STOP;
 #endif
+
+#ifdef CONFIG_IRINGBUF
+  for(int i=0;_this->logbuf[i];++i){
+    if((tail+1) % RINGBUF_SIZE == head) head = (head + 1) % RINGBUF_SIZE;
+    ringbuf[tail] = _this->logbuf[i];
+    tail = (tail + 1) % RINGBUF_SIZE;
+  }
+  if((tail+1) % RINGBUF_SIZE == head) head = (head + 1) % RINGBUF_SIZE;
+  ringbuf[tail] = '\n';
+  tail = (tail + 1) % RINGBUF_SIZE;
+#endif
+
 }
 
 static void exec_once(Decode *s, vaddr_t pc) {
@@ -98,6 +114,10 @@ static void statistic() {
 void assert_fail_msg() {
   isa_reg_display();
   statistic();
+#ifdef CONFIG_IRINGBUF
+  for(int i = head; i != tail; i = (i + 1) % RINGBUF_SIZE)
+    putchar(ringbuf[i]);
+#endif
 }
 
 /* Simulate how the CPU works. */
