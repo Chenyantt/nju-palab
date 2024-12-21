@@ -14,9 +14,6 @@
 ***************************************************************************************/
 
 #include <cpu/cpu.h>
-#ifdef CONFIG_FTRACE
-#include <cpu/ftrace.h>
-#endif
 
 void sdb_mainloop();
 
@@ -26,6 +23,5 @@ void engine_start() {
 #else
   /* Receive commands from user. */
   sdb_mainloop();
-  IFDEF(CONFIG_FTRACE, display_ftrace());
 #endif
 }

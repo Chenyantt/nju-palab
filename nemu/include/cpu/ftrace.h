@@ -163,10 +163,12 @@ static inline void display_ftrace()
         if (ftrace_log[i].type == 0)
         {
             printf("call [%s@0x%08x]\n", ftrace_log[i].name, ftrace_log[i].dnpc);
+            ++depth;
         }
         else
         {
             printf("ret  [%s]\n", ftrace_log[i].name);
+            --depth;
         }
     }
 }
