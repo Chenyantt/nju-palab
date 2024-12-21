@@ -167,8 +167,8 @@ static inline void display_ftrace()
         }
         else
         {
-            printf("ret  [%s]\n", ftrace_log[i].name);
             --depth;
+            printf("ret  [%s]\n", ftrace_log[i].name);
         }
     }
 }
