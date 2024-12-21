@@ -158,21 +158,22 @@ static inline void display_ftrace()
     for (int i = 0; i < ftracelog_size; ++i)
     {
         printf("0x%08x: ", ftrace_log[i].pc);
-        for (int j = 0; j < depth; ++j)
-            putchar(' '), putchar(' ');
         if (ftrace_log[i].type == 0)
         {
+            for (int j = 0; j < depth; ++j)
+                putchar(' '), putchar(' ');
             printf("call [%s@0x%08x]\n", ftrace_log[i].name, ftrace_log[i].dnpc);
             ++depth;
         }
         else
         {
             --depth;
+            for (int j = 0; j < depth; ++j)
+                putchar(' '), putchar(' ');
             printf("ret  [%s]\n", ftrace_log[i].name);
         }
     }
 }
-
 
 #endif
 
