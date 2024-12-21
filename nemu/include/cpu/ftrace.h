@@ -1,8 +1,6 @@
 #ifndef __FTRACE_H__
 #define __FTRACE_H__
 
-
-
 #ifdef CONFIG_FTRACE
 #include <elf.h>
 #include <common.h>
@@ -177,4 +175,5 @@ static inline void display_ftrace()
 
 
 #endif
+
 #endif
