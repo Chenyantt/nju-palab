@@ -104,9 +104,7 @@ static inline int init_ftrace(char *filename)
             Elf32_Sym sym;
             for (int j = 0; j < sym_num; ++j)
             {
-                puts("1");
                 ret = fread((void *)(&sym), 1, sizeof(sym), fp);
-                printf("%d\n", sym.st_info);
 
                 if (ELF32_ST_TYPE(sym.st_info) == STT_FUNC)
                 {
