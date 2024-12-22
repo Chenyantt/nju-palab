@@ -79,8 +79,8 @@ void mmio_write(paddr_t addr, int len, word_t data)
 #ifdef CONFIG_DTRACE
   if (ret != NULL)
   {
-    if( CONFIG_DTRACE_COND)
-      printf("Read the device: %s at [0x%08x, 0x%08x]\n", ret->name, ret->low, ret->high);
+    // if( CONFIG_DTRACE_COND)
+    //   printf("Read the device: %s at [0x%08x, 0x%08x]\n", ret->name, ret->low, ret->high);
   }
 #endif
   map_write(addr, len, data, ret);
