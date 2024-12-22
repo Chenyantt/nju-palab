@@ -66,8 +66,8 @@ word_t mmio_read(paddr_t addr, int len)
 #ifdef CONFIG_DTRACE
   if (ret != NULL)
   {
-    // if( CONFIG_DTRACE_COND)
-    //   printf("Read the device: %s at [0x%08x, 0x%08x]\n", ret->name, ret->low, ret->high);
+    if( CONFIG_DTRACE_COND)
+      printf("Read the device: %s at [0x%08x, 0x%08x]\n", ret->name, ret->low, ret->high);
   }
 #endif
   return map_read(addr, len, ret);
