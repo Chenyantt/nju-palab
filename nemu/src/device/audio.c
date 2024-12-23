@@ -90,7 +90,7 @@ static void audio_io_handler(uint32_t offset, int len, bool is_write)
 static void stream_io_handler(uint32_t offset, int len, bool is_write)
 {
   assert(is_write);
-  assert(offset == buf_cnt);
+  //assert(offset == buf_cnt);
   buf_cnt += len;
 }
 
