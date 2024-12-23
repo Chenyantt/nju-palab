@@ -31,72 +31,127 @@ enum
 static uint8_t *sbuf = NULL;
 static uint32_t *audio_base = NULL;
 
-static int buf_cnt = 0;
+// static int buf_cnt = 0;
 
-void callBack_fillAudioData(void *userdata, uint8_t *stream, int len)
-{
-  SDL_memset(stream, 0, len);
-  if (buf_cnt == 0)
-    return;
-  len = (len > buf_cnt ? buf_cnt : len);
-  SDL_MixAudio(stream, sbuf, len, SDL_MIX_MAXVOLUME);
-  if (len < buf_cnt)
-  {
-    buf_cnt -= len;
-    memmove(sbuf, sbuf + len, buf_cnt);
-  }
-  else
-    buf_cnt = 0;
-}
+// void callBack_fillAudioData(void *userdata, uint8_t *stream, int len)
+// {
+//   SDL_memset(stream, 0, len);
+//   if (buf_cnt == 0)
+//     return;
+//   len = (len > buf_cnt ? buf_cnt : len);
+//   SDL_MixAudio(stream, sbuf, len, SDL_MIX_MAXVOLUME);
+//   if (len < buf_cnt)
+//   {
+//     buf_cnt -= len;
+//     memmove(sbuf, sbuf + len, buf_cnt);
+//   }
+//   else
+//     buf_cnt = 0;
+// }
 
-static void audio_io_handler(uint32_t offset, int len, bool is_write)
-{
-  if (offset == 12)
-  {
-    return;
+// static void audio_io_handler(uint32_t offset, int len, bool is_write)
+// {
+//   if (offset == 12)
+//   {
+//     return;
     
+//   }
+//   else if (offset == 20)
+//   {
+//     assert(!is_write);
+//     audio_base[reg_count] = buf_cnt;
+//   }
+//   else
+//   {
+//     assert(is_write);
+//     if (audio_base[reg_init] == 1)
+//     {
+//       SDL_AudioSpec s = {};
+//       s.format = AUDIO_S16SYS;
+//       s.userdata = NULL;
+//       s.freq = audio_base[reg_freq];
+//       s.channels = audio_base[reg_channels];
+//       s.samples = audio_base[reg_samples];
+//       s.callback = callBack_fillAudioData;
+//       SDL_InitSubSystem(SDL_INIT_AUDIO);
+//       if (SDL_OpenAudio(&s, NULL) == -1)
+//       {
+//         perror("Cannot open the audio device!\n");
+//       }
+//       else
+//       {
+//         SDL_PauseAudio(0);
+//       }
+//       audio_base[reg_init] = 0;
+//     }
+//   }
+// }
+
+// static void stream_io_handler(uint32_t offset, int len, bool is_write)
+// {
+//   assert(is_write);
+//   assert(offset == buf_cnt);
+//   buf_cnt += len;
+// }
+
+// void init_audio()
+// {
+//   uint32_t space_size = sizeof(uint32_t) * nr_reg;
+//   audio_base = (uint32_t *)new_space(space_size);
+// #ifdef CONFIG_HAS_PORT_IO
+//   add_pio_map("audio", CONFIG_AUDIO_CTL_PORT, audio_base, space_size, audio_io_handler);
+// #else
+//   add_mmio_map("audio", CONFIG_AUDIO_CTL_MMIO, audio_base, space_size, audio_io_handler);
+// #endif
+
+//   sbuf = (uint8_t *)new_space(CONFIG_SB_SIZE);
+//   add_mmio_map("audio-sbuf", CONFIG_SB_ADDR, sbuf, CONFIG_SB_SIZE, stream_io_handler);
+//   audio_base[reg_sbuf_size] = CONFIG_SB_SIZE;
+// }
+
+static uint32_t sbuf_pos = 0; //这一句非常重要
+
+void sdl_audio_callback(void *userdata, uint8_t *stream, int len){
+  SDL_memset(stream, 0, len);
+  uint32_t used_cnt = audio_base[reg_count];
+  len = len > used_cnt ? used_cnt : len;
+  
+  uint32_t sbuf_size = audio_base[reg_sbuf_size];
+  if( (sbuf_pos + len) > sbuf_size ){
+    SDL_MixAudio(stream, sbuf + sbuf_pos, sbuf_size - sbuf_pos , SDL_MIX_MAXVOLUME);
+    SDL_MixAudio(stream +  (sbuf_size - sbuf_pos), 
+                    sbuf +  (sbuf_size - sbuf_pos), 
+                    len - (sbuf_size - sbuf_pos), 
+                    SDL_MIX_MAXVOLUME);
   }
-  else if (offset == 20)
-  {
-    assert(!is_write);
-    audio_base[reg_count] = buf_cnt;
-  }
-  else
-  {
-    assert(is_write);
-    if (audio_base[reg_init] == 1)
-    {
-      SDL_AudioSpec s = {};
-      s.format = AUDIO_S16SYS;
-      s.userdata = NULL;
-      s.freq = audio_base[reg_freq];
-      s.channels = audio_base[reg_channels];
-      s.samples = audio_base[reg_samples];
-      s.callback = callBack_fillAudioData;
-      SDL_InitSubSystem(SDL_INIT_AUDIO);
-      if (SDL_OpenAudio(&s, NULL) == -1)
-      {
-        perror("Cannot open the audio device!\n");
-      }
-      else
-      {
-        SDL_PauseAudio(0);
-      }
-      audio_base[reg_init] = 0;
-    }
+  else 
+    SDL_MixAudio(stream, sbuf + sbuf_pos, len , SDL_MIX_MAXVOLUME);
+  sbuf_pos = (sbuf_pos + len) % sbuf_size;
+  audio_base[reg_count] -= len;
+}
+
+void init_sound() {
+  SDL_AudioSpec s = {};
+  s.format = AUDIO_S16SYS;  // 假设系统中音频数据的格式总是使用16位有符号数来表示
+  s.userdata = NULL;        // 不使用
+  s.freq = audio_base[reg_freq];
+  s.channels = audio_base[reg_channels];
+  s.samples = audio_base[reg_samples];
+  s.callback = sdl_audio_callback;
+  SDL_InitSubSystem(SDL_INIT_AUDIO);
+  SDL_OpenAudio(&s, NULL);
+  SDL_PauseAudio(0);       //播放，可以执行音频子系统的回调函数
+}
+
+static void audio_io_handler(uint32_t offset, int len, bool is_write) {
+  if(audio_base[reg_init]==1){
+    init_sound();
+    audio_base[reg_init] = 0;
   }
 }
 
-static void stream_io_handler(uint32_t offset, int len, bool is_write)
-{
-  assert(is_write);
-  assert(offset == buf_cnt);
-  buf_cnt += len;
-}
-
-void init_audio()
-{
-  uint32_t space_size = sizeof(uint32_t) * nr_reg;
+void init_audio() {
+    uint32_t space_size = sizeof(uint32_t) * nr_reg;
   audio_base = (uint32_t *)new_space(space_size);
 #ifdef CONFIG_HAS_PORT_IO
   add_pio_map("audio", CONFIG_AUDIO_CTL_PORT, audio_base, space_size, audio_io_handler);
@@ -105,6 +160,7 @@ void init_audio()
 #endif
 
   sbuf = (uint8_t *)new_space(CONFIG_SB_SIZE);
-  add_mmio_map("audio-sbuf", CONFIG_SB_ADDR, sbuf, CONFIG_SB_SIZE, stream_io_handler);
-  audio_base[reg_sbuf_size] = CONFIG_SB_SIZE;
+  add_mmio_map("audio-sbuf", CONFIG_SB_ADDR, sbuf, CONFIG_SB_SIZE, NULL);
+  audio_base[reg_sbuf_size] = CONFIG_SB_SIZE;    //确定流缓冲区的大小
 }
+
