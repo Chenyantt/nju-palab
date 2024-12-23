@@ -30,7 +30,35 @@ enum {
 static uint8_t *sbuf = NULL;
 static uint32_t *audio_base = NULL;
 
+void callBack_fillAudioData(void *userdata, uint8_t *stream, int len){
+  
+}
+
 static void audio_io_handler(uint32_t offset, int len, bool is_write) {
+  if(offset == 12){
+    assert(!is_write);
+    audio_base[reg_sbuf_size] = CONFIG_SB_SIZE;
+  }else if(offset == 20){
+    assert(!is_write);
+    audio_base[reg_count]=;
+  }else{
+    assert(is_write);
+    if(audio_base[reg_init] == 1){
+      SDL_AudioSpec s = {};
+      s.format = AUDIO_S16SYS;
+      s.userdata = NULL;
+      s.freq = audio_base[reg_freq];
+      s.channels = audio_base[reg_channels];
+      s.samples = audio_base[reg_samples];
+      s.callback = callBack_fillAudioData;
+      SDL_InitSubSystem(SDL_INIT_AUDIO);
+      if(SDL_OpenAudio(&s, NULL) == -1){
+        perror("Cannot open the audio device!\n");
+      }else{
+        SDL_PauseAudio(0);
+      }
+    }
+  }
 }
 
 void init_audio() {
