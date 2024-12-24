@@ -54,7 +54,6 @@ static void audio_io_handler(uint32_t offset, int len, bool is_write)
   if (offset == 12)
   {
     return;
-    
   }
   else if (offset == 20)
   {
