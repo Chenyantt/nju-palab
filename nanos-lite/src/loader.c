@@ -13,26 +13,43 @@ size_t ramdisk_read(void *buf, size_t offset, size_t len);
 
 static uintptr_t loader(PCB *pcb, const char *filename)
 {
+  // Elf_Ehdr ehdr;
+  // ramdisk_read(&ehdr, 0, sizeof(Elf_Ehdr));
+  // assert(*(uint32_t *)ehdr.e_ident == 0x464c457f);
+
+  // assert(ehdr.e_machine == EXPECT_TYPE);
+  // uint16_t ph_nr = ehdr.e_phnum;
+  // uint16_t ph_ensz = ehdr.e_phentsize;
+  // for (int i = 0; i < ph_nr; ++i)
+  // {
+  //   Elf_Phdr phdr;
+  //   ramdisk_read(&phdr, ehdr.e_phoff + i * ph_ensz, ph_ensz);
+  //   printf("%d\n", phdr.p_type);
+  //   if (phdr.p_type == PT_LOAD)
+  //   {
+  //     Elf32_Off off = phdr.p_offset;
+  //     Elf32_Addr vaddr = phdr.p_vaddr;
+  //     uint32_t mem_sz = phdr.p_memsz;
+  //     uint32_t file_sz = phdr.p_filesz;
+  //     void *p = (void*)vaddr;
+  //     Log("Jump to entry = %p", vaddr);
+  //     ramdisk_read(p, off, file_sz);
+  //     memset(p + file_sz, 0, mem_sz - file_sz);
+  //   }
+  // }
+  // return ehdr.e_entry;
+  // open elf
   Elf_Ehdr ehdr;
   ramdisk_read(&ehdr, 0, sizeof(Elf_Ehdr));
   assert(*(uint32_t *)ehdr.e_ident == 0x464c457f);
-  uint16_t ph_nr = ehdr.e_phnum;
-  uint16_t ph_ensz = ehdr.e_phentsize;
-  for (int i = 0; i < ph_nr; ++i)
-  {
-    Elf_Phdr phdr;
-    ramdisk_read(&phdr, ehdr.e_phoff + i * ph_ensz, ph_ensz);
-    printf("%d\n", phdr.p_type);
-    if (phdr.p_type == PT_LOAD)
-    {
-      Elf32_Off off = phdr.p_offset;
-      Elf32_Addr vaddr = phdr.p_vaddr;
-      uint32_t mem_sz = phdr.p_memsz;
-      uint32_t file_sz = phdr.p_filesz;
-      uint8_t *p = (uint8_t*)vaddr;
-      Log("Jump to entry = %p", vaddr);
-      ramdisk_read(p, off, file_sz);
-      memset(p + file_sz, 0, mem_sz - file_sz);
+
+  // read phdr
+  Elf_Phdr ph[ehdr.e_phnum];
+  ramdisk_read(ph, ehdr.e_phoff, sizeof(Elf_Phdr)*ehdr.e_phnum);
+  for (int i = 0; i < ehdr.e_phnum; i++) {
+    if (ph[i].p_type == PT_LOAD) {
+      ramdisk_read((void *)ph[i].p_vaddr, ph[i].p_offset, ph[i].p_memsz);
+      memset((void *)(ph[i].p_vaddr + ph[i].p_filesz), 0, ph[i].p_memsz - ph[i].p_filesz);
     }
   }
   return ehdr.e_entry;
