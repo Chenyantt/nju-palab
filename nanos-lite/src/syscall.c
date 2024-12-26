@@ -1,7 +1,7 @@
 #include <common.h>
 #include "syscall.h"
 
-#define strace(); Log("[strace]:%s, a0:%d, a1:%d, a2:%d, a3:%d, ret:%d", syscall_name[a[0]], a[0], c->GPR1, c->GPR2, c->GPRx);
+#define strace(); Log("[strace %s]: a0:%d, a1:%d, a2:%d, a3:%d, ret:%d", syscall_name[a[0]], a[0], c->GPR1, c->GPR2, c->GPRx);
 
 static char* syscall_name[] = {"exit", "yield", "open", "read",
                                "write", "kill", "getpid", "close",
