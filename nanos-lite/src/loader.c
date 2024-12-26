@@ -22,9 +22,9 @@ static uintptr_t loader(PCB *pcb, const char *filename)
   {
     Elf_Phdr phdr;
     ramdisk_read(&phdr, ehdr.e_phoff + i * ph_nr, ph_ensz);
-    printf("yes\n");
     if (phdr.p_type == PT_LOAD)
     {
+      printf("%d\n", phdr.p_type);
       Elf32_Off off = phdr.p_offset;
       Elf32_Addr vaddr = phdr.p_vaddr;
       uint32_t mem_sz = phdr.p_memsz;
