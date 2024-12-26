@@ -21,6 +21,7 @@ int printf(const char *fmt, ...)
       {
         switch (*fmt_ptr)
         {
+        case 'p':
         case 'd':
         {
           int i = va_arg(args, int);
