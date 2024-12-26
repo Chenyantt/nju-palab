@@ -26,7 +26,7 @@
 #define Mw vaddr_write
 #define CSR(i) cpu.csr[i]
 
-#define MCAUSE  0x342
+#define MEPC 0x341
 
 enum {
   TYPE_I, TYPE_U, TYPE_S, TYPE_R_, TYPE_J, TYPE_B, TYPE_Z, 
@@ -138,7 +138,9 @@ static int decode_exec(Decode *s) {
   INSTPAT("??????? ????? ????? 110 00000 11100 11", csrrsi , Z, R(rd) = CSR(imm), CSR(imm) |= BITS(s->isa.inst, 19, 15));
   INSTPAT("??????? ????? ????? 111 00000 11100 11", csrrci , Z, R(rd) = CSR(imm), CSR(imm) ^= BITS(s->isa.inst, 19, 15));
 
-  INSTPAT("0000000 00000 00000 000 00000 11100 11", ecall  , N, s->dnpc = isa_raise_intr(isa_reg_str2val("a7", NULL), s->pc));
+  INSTPAT("0000000 00000 00000 000 00000 11100 11", ecall  , N, s->dnpc = isa_raise_intr(8, s->pc));
+  INSTPAT("0011000 00010 00000 000 00000 11100 11", mret   , N, s->dnpc = cpu.csr[MEPC] + 4);
+
 
   INSTPAT("0000000 00001 00000 000 00000 11100 11", ebreak , N, NEMUTRAP(s->pc, R(10))); // R(10) is $a0
   INSTPAT("??????? ????? ????? ??? ????? ????? ??", inv    , N, INV(s->pc));
