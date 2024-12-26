@@ -16,13 +16,13 @@ static uintptr_t loader(PCB *pcb, const char *filename)
   Elf_Ehdr ehdr;
   ramdisk_read(&ehdr, 0, sizeof(Elf_Ehdr));
   assert(*(uint32_t *)ehdr.e_ident == 0x464c457f);
-  printf("yes\n");
   uint16_t ph_nr = ehdr.e_phnum;
   uint16_t ph_ensz = ehdr.e_phentsize;
   for (int i = 0; i < ph_nr; ++i)
   {
     Elf_Phdr phdr;
     ramdisk_read(&phdr, ehdr.e_phoff + i * ph_nr, ph_ensz);
+    printf("yes\n");
     if (phdr.p_type == PT_LOAD)
     {
       Elf32_Off off = phdr.p_offset;
