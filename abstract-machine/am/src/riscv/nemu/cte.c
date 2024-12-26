@@ -7,9 +7,14 @@ static Context* (*user_handler)(Event, Context*) = NULL;
 Context* __am_irq_handle(Context *c) {
   if (user_handler) {
     Event ev = {0};
-    switch (c->mcause) {
-      case 8:ev.event = EVENT_YIELD; break;
-      default: ev.event = EVENT_ERROR; break;
+    int type = (int)c->GPR1;
+    if(type >=0 && type <= 19){
+      ev.event=EVENT_SYSCALL;
+    }else if(type < 0){
+      ev.event = EVENT_YIELD;
+    }else{
+      ev.event = EVENT_ERROR;
+      assert(0);
     }
 
     c = user_handler(ev, c);
