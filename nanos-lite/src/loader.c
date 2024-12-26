@@ -30,6 +30,7 @@ static uintptr_t loader(PCB *pcb, const char *filename)
       uint32_t mem_sz = phdr.p_memsz;
       uint32_t file_sz = phdr.p_filesz;
       uint8_t *p = (uint8_t*)vaddr;
+      Log("Jump to entry = %p", vaddr);
       ramdisk_read(p, off, file_sz);
       memset(p + file_sz, 0, mem_sz - file_sz);
     }
