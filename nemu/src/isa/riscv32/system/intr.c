@@ -15,9 +15,9 @@
 
 #include <isa.h>
 
-#define MTVEC 0x305
-#define MEPC 0x341
-#define MCAUSE 0x342
+#define MTVEC (0x305)
+#define MEPC (0x341)
+#define MCAUSE (0x342)
 
 word_t isa_raise_intr(word_t NO, vaddr_t epc) {
   /* TODO: Trigger an interrupt/exception with ``NO''.
