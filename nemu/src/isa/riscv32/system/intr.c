@@ -25,7 +25,6 @@ word_t isa_raise_intr(word_t NO, vaddr_t epc) {
    */
 #ifdef CONFIG_ETRACE
   printf("Raise an exception: %u at 0x%08x\n", NO, epc);
-  
 #endif
   cpu.csr[MEPC] = epc;
   cpu.csr[MCAUSE] = NO;
