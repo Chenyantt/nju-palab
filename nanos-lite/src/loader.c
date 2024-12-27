@@ -31,7 +31,6 @@ static uintptr_t loader(PCB *pcb, const char *filename)
 
   uint16_t ph_nr = ehdr.e_phnum;
   uint16_t ph_ensz = ehdr.e_phentsize;
-  fs_read(fd, &ehdr, sizeof(Elf_Ehdr));
   fs_lseek(fd, ehdr.e_phoff, SEEK_SET);
   for (int i = 0; i < ph_nr; ++i)
   {
