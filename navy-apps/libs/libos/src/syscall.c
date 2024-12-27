@@ -82,8 +82,11 @@ static char *pbreak = &_end;
 
 void *_sbrk(intptr_t increment)
 {
-  if (_syscall_(SYS_brk, pbreak + increment, 0, 0) == 0)
-    return pbreak = pbreak + increment;
+  if (_syscall_(SYS_brk, pbreak + increment, 0, 0) == 0){
+    char* ret = pbreak;
+    pbreak += increment;
+    return pbreak;
+  }
   else return (void*)(-1);
 }
 
