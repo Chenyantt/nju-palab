@@ -21,7 +21,6 @@ size_t ramdisk_read(void *buf, size_t offset, size_t len);
 static uintptr_t loader(PCB *pcb, const char *filename)
 {
   int fd = fs_open(filename, 0, 0);
-  Log("11111111111");
   if(fd < 0){
     panic("cannot open the file: %s", filename);
   }
@@ -38,15 +37,15 @@ static uintptr_t loader(PCB *pcb, const char *filename)
     fs_read(fd, &phdr, ph_ensz);
     if (phdr.p_type == PT_LOAD)
     {
-      Elf32_Off off = phdr.p_offset;
-      Elf32_Addr vaddr = phdr.p_vaddr;
-      uint32_t mem_sz = phdr.p_memsz;
-      uint32_t file_sz = phdr.p_filesz;
-      void *p = (void*)vaddr;
-      Log("Jump to entry = %p", vaddr);
-      fs_lseek(fd, off, SEEK_SET);
-      fs_read(fd, p, file_sz);
-      memset(p + file_sz, 0, mem_sz - file_sz);
+      // Elf32_Off off = phdr.p_offset;
+      // Elf32_Addr vaddr = phdr.p_vaddr;
+      // uint32_t mem_sz = phdr.p_memsz;
+      // uint32_t file_sz = phdr.p_filesz;
+      // void *p = (void*)vaddr;
+      // Log("Jump to entry = %p", vaddr);
+      // fs_lseek(fd, off, SEEK_SET);
+      // fs_read(fd, p, file_sz);
+      // memset(p + file_sz, 0, mem_sz - file_sz);
     }
   }
   fs_close(fd);
