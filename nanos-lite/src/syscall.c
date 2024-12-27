@@ -61,7 +61,7 @@ static void do_close(Context *c)
 static void do_lseek(Context *c)
 {
   uintptr_t fd = c->GPR2;
-  uintptr_t offset = c->GPR2;
+  uintptr_t offset = c->GPR3;
   uintptr_t whence = c->GPR4;
   c->GPRx = fs_lseek(fd, offset, whence);
 }
