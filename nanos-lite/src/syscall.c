@@ -58,8 +58,10 @@ void do_syscall(Context *c)
   case SYS_write:
     do_write(c);
     break;
+  case SYS_brk:
+    c->GPRx = 0;
   default:
     panic("Unhandled syscall ID = %d", a[0]);
   }
-//  strace();
+  //  strace();
 }
