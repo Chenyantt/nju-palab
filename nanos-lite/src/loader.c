@@ -30,7 +30,6 @@ static uintptr_t loader(PCB *pcb, const char *filename)
 
   uint16_t ph_nr = ehdr.e_phnum;
   uint16_t ph_ensz = ehdr.e_phentsize;
-  Log("phoff = %p", ehdr.e_phoff);
   fs_lseek(fd, ehdr.e_phoff, SEEK_SET);
   for (int i = 0; i < ph_nr; ++i)
   {
@@ -44,7 +43,6 @@ static uintptr_t loader(PCB *pcb, const char *filename)
       uint32_t mem_sz = phdr.p_memsz;
       uint32_t file_sz = phdr.p_filesz;
       void *p = (void*)vaddr;
-      Log("Jump to entry = %p", vaddr);
       fs_lseek(fd, off, SEEK_SET);
       fs_read(fd, p, file_sz);
       memset(p + file_sz, 0, mem_sz - file_sz);
