@@ -35,6 +35,7 @@ static uintptr_t loader(PCB *pcb, const char *filename)
   for (int i = 0; i < ph_nr; ++i)
   {
     Elf_Phdr phdr;
+      fs_lseek(fd, ehdr.e_phoff + i * ph_ensz, SEEK_SET);
     fs_read(fd, &phdr, ph_ensz);
     if (phdr.p_type == PT_LOAD)
     {
