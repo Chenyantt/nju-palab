@@ -93,7 +93,7 @@ size_t fs_write(int fd, const void *buf, size_t len)
 
 size_t fs_lseek(int fd, size_t offset, int whence)
 {
-  Log("offset: %d whenceL %d\n",offset,whence);
+  Log("size: %d offset: %d whenceL %d\n",file_table[fd].size,offset,whence);
   if (fd == 0 || fd == 1 || fd == 2)
     return 0;
   switch (whence)
