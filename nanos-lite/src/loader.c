@@ -52,15 +52,15 @@ static uintptr_t loader(PCB *pcb, const char *filename)
   // return ehdr.e_entry;
   // open elf
   Elf_Ehdr ehdr;
-  ramdisk_read(&ehdr, 477499, sizeof(Elf_Ehdr));
+  ramdisk_read(&ehdr, 400143, sizeof(Elf_Ehdr));
   assert(*(uint32_t *)ehdr.e_ident == 0x464c457f);
 
   // read phdr
   Elf_Phdr ph[ehdr.e_phnum];
-  ramdisk_read(ph, ehdr.e_phoff + 477499, sizeof(Elf_Phdr)*ehdr.e_phnum);
+  ramdisk_read(ph, ehdr.e_phoff + 400143, sizeof(Elf_Phdr)*ehdr.e_phnum);
   for (int i = 0; i < ehdr.e_phnum; i++) {
     if (ph[i].p_type == PT_LOAD) {
-      ramdisk_read((void *)ph[i].p_vaddr, ph[i].p_offset + 477499, ph[i].p_memsz);
+      ramdisk_read((void *)ph[i].p_vaddr, ph[i].p_offset + 400143, ph[i].p_memsz);
       memset((void *)(ph[i].p_vaddr + ph[i].p_filesz), 0, ph[i].p_memsz - ph[i].p_filesz);
     }
   }
