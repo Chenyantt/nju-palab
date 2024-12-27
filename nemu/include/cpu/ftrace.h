@@ -23,7 +23,6 @@ extern uint32_t symtab_size;
 extern FTraceLog ftrace_log[FTRACE_SIZE];
 extern uint32_t ftracelog_size;
 
-
 static inline int init_ftrace(char *filename)
 {
     Elf32_Ehdr ehdr;
