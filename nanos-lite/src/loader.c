@@ -21,11 +21,11 @@ size_t ramdisk_read(void *buf, size_t offset, size_t len);
 static uintptr_t loader(PCB *pcb, const char *filename)
 {
   int fd = fs_open(filename, 0, 0);
+  Log("11111111111");
   if(fd < 0){
     panic("cannot open the file: %s", filename);
   }
   Elf_Ehdr ehdr;
-  fs_lseek(fd, 0, SEEK_SET);
   fs_read(fd, &ehdr, sizeof(Elf_Ehdr));
   assert(*(uint32_t *)ehdr.e_ident == 0x464c457f);
 
