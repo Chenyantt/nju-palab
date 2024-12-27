@@ -78,14 +78,14 @@ int _write(int fd, void *buf, size_t count)
 }
 
 extern char _end;
-static char *pbreak = &_end;
+static intptr_t pbreak = (intptr_t)&_end;
 
 void *_sbrk(intptr_t increment)
 {
   if (_syscall_(SYS_brk, pbreak + increment, 0, 0) == 0){
-    char* ret = pbreak;
+    intptr_t ret = pbreak;
     pbreak += increment;
-    return pbreak;
+    return (void*)pbreak;
   }
   else return (void*)(-1);
 }
