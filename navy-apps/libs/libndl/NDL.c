@@ -60,7 +60,7 @@ void NDL_OpenCanvas(int *w, int *h)
   {
     *w = canvas_h = screen_h;
     *h = canvas_w = screen_w;
-    printf("sw = %d sh =%d, cw = %d,ch = %d\n", screen_w, screen_h, canvas_w, canvas_h)
+    printf("sw = %d sh =%d, cw = %d,ch = %d\n", screen_w, screen_h, canvas_w, canvas_h);
   }
   else
   {
