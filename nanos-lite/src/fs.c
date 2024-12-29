@@ -43,7 +43,6 @@ static Finfo file_table[] __attribute__((used)) = {
     [FD_STDIN] = {"stdin", 0, 0, invalid_read, invalid_write},
     [FD_STDOUT] = {"stdout", 0, 0, invalid_read, serial_write},
     [FD_STDERR] = {"stderr", 0, 0, invalid_read, serial_write},
-    [FD_EVENT] = {"/dev/events", 0, 0, events_read, invalid_write},
 #include "files.h"
 };
 
@@ -52,7 +51,6 @@ int fs_open(const char *pathname, int flags, int mode)
   int file_nr = sizeof(file_table) / sizeof(Finfo);
   for (int i = 3; i < file_nr; ++i)
   {
-    printf("1\n");
     if (strcmp(pathname, file_table[i].name) == 0)
     {
       file_table[i].open_offset = 0;
