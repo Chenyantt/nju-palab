@@ -4,6 +4,7 @@
 
 int main() {
   NDL_Init(0);
+  printf("Timer start!\n");
   uint32_t ms = 500;
   uint32_t passed_time = NDL_GetTicks();
   while (1) {
