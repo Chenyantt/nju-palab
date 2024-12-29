@@ -193,6 +193,7 @@ int vsnprintf(char *out, size_t n, const char *fmt, va_list ap)
       if((int)(buf - out) >= n) return n;
     }
   }
+  *buf = 0;
   return (int)(buf - out);
 }
 
