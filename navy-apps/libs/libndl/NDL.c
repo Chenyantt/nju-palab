@@ -60,20 +60,22 @@ void NDL_OpenCanvas(int *w, int *h)
   {
     *w = canvas_h = screen_h;
     *h = canvas_w = screen_w;
+    printf("sw = %d sh =%d, cw = %d,ch = %d\n", screen_w, screen_h, canvas_w, canvas_h)
   }
   else
   {
     canvas_h = *h;
     canvas_w = *w;
-    canvas_x=(screen_w - canvas_w) / 2;
-    canvas_y=(screen_h - canvas_h) / 2;
+    canvas_x = (screen_w - canvas_w) / 2;
+    canvas_y = (screen_h - canvas_h) / 2;
   }
 }
 
 void NDL_DrawRect(uint32_t *pixels, int x, int y, int w, int h)
 {
-  for (int i = 0; i < h && y + i < canvas_h; ++i) {
-  
+  for (int i = 0; i < h && y + i < canvas_h; ++i)
+  {
+
     lseek(fbdev, ((y + canvas_y + i) * screen_w + (x + canvas_x)) * 4, SEEK_SET);
     write(fbdev, pixels + i * w, 4 * (w < canvas_w - x ? w : canvas_w - x));
   }
