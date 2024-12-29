@@ -66,9 +66,10 @@ static void do_lseek(Context *c)
   c->GPRx = fs_lseek(fd, offset, whence);
 }
 
-struct  timeval{
-  long  tv_sec;
-  long  tv_usec;
+struct timeval
+{
+  long tv_sec;
+  long tv_usec;
 };
 
 static void do_gettimeofday(Context *c)
@@ -121,5 +122,5 @@ void do_syscall(Context *c)
   default:
     panic("Unhandled syscall ID = %d", a[0]);
   }
-  //strace();
+  // strace();
 }
