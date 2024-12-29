@@ -127,12 +127,73 @@ int sprintf(char *out, const char *fmt, ...)
 
 int snprintf(char *out, size_t n, const char *fmt, ...)
 {
-  panic("Not implemented");
+  assert((out != NULL) && (fmt != NULL));
+  if(n == 0) return 0;
+  va_list args;
+  va_start(args, fmt);
+  int ret = vsnprintf(out, n, fmt, args);
+  va_end(args);
+  return ret;
 }
 
 int vsnprintf(char *out, size_t n, const char *fmt, va_list ap)
 {
-  panic("Not implemented");
+  char *buf = out;
+  const char *fmt_ptr = fmt;
+  while (*fmt_ptr)
+  {
+    if (*fmt_ptr == '%')
+    {
+      ++fmt_ptr;
+      if (*fmt_ptr)
+      {
+        switch (*fmt_ptr)
+        {
+        case 'd':
+        {
+          int i = va_arg(ap, int);
+          if (i == 0)
+          {
+            *buf++ = '0';
+            if((int)(buf - out) >= n) return n;
+            break;
+          }
+          char tmp[10] = {0};
+          int width = -1;
+          if (i < 0){
+            i = -i, *buf++ = '-';
+            if((int)(buf - out) >= n) return n;
+          }
+          for (int t = i; t; tmp[++width] = '0' + t % 10, t /= 10)
+            ;
+          for (int j = width; j >= 0; --j){
+            *buf++ = tmp[j];
+            if((int)(buf - out) >= n) return n;
+          }
+          break;
+        }
+        case 's':
+        {
+          char *s = va_arg(ap, char *);
+          for (; *s; s++){
+            *buf++ = *s;
+            if((int)(buf - out) >= n) return n;
+          }
+          break;
+        }
+        default:
+          break;
+        }
+        fmt_ptr++;
+      }
+    }
+    else
+    {
+      *buf++ = *fmt_ptr++;
+      if((int)(buf - out) >= n) return n;
+    }
+  }
+  return (int)(buf - out);
 }
 
 #endif
