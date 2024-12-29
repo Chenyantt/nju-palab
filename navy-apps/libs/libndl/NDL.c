@@ -148,7 +148,6 @@ int NDL_Init(uint32_t flags)
     ++i;
   }
   screen_w = w, screen_h = h;
-      printf("sw = %d sh =%d, cw = %d,ch = %d\n", screen_w, screen_h, canvas_w, canvas_h);
   return 0;
 }
 
