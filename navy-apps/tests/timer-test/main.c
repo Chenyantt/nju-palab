@@ -10,6 +10,7 @@ int main() {
   while (1) {
     while(passed_time < ms){
       passed_time = NDL_GetTicks();
+      printf("passed)time = %u\n", passed_time);
     }
     printf("mseconds = %u\n", ms);
     ms += 500;
