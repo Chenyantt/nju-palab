@@ -32,7 +32,7 @@ size_t events_read(void *buf, size_t offset, size_t len)
   }
   else
   {
-    return snprintf((char *)buf, len, "%s %s\n\0", ev.keydown ? "kd" : "ku", keyname[ev.keycode]);
+    return sprintf((char *)buf, "%s %s\n\0", ev.keydown ? "kd" : "ku", keyname[ev.keycode]);
   }
 }
 
