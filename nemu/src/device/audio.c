@@ -28,6 +28,7 @@ enum
   nr_reg
 };
 
+
 static uint8_t *sbuf = NULL;
 static uint32_t *audio_base = NULL;
 
